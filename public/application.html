@@ -8,20 +8,111 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- Header -->
   <header>
-    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="#requirements">Requirements</a></li>
-        <li><a href="track.html">Track Application</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+      <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#requirements">Requirements</a></li>
+          <li><a href="track.html">Track Application</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main class="form-container">
-    <!-- ECOWAS Visa-Free Notice -->
+  <!-- Slim progress / context -->
+  <section class="container" style="max-width:900px; margin:24px auto 0;">
+    <div style="display:grid; grid-template-columns:1fr; gap:8px;">
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <span style="background:#004080; color:#fff; padding:6px 10px; border-radius:999px; font-size:.9rem;">Step 1: Application</span>
+        <span style="background:#e8f0fe; color:#003366; padding:6px 10px; border-radius:999px; font-size:.9rem;">Step 2: Payment</span>
+        <span style="background:#e8f0fe; color:#003366; padding:6px 10px; border-radius:999px; font-size:.9rem;">Step 3: Confirmation</span>
+      </div>
+      <p style="margin:0; color:#555; font-size:.95rem;">
+        Fill the form below. You’ll pay the fee securely with Stripe, then we’ll submit your application automatically.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main form card -->
+  <main class="form-container" style="max-width:900px;">
+    <h2 style="text-align:left;">Visa Application Form</h2>
+
+    <!-- Two-column responsive layout -->
+    <div style="display:grid; grid-template-columns:1fr; gap:18px;">
+      <form id="applicationForm" enctype="multipart/form-data" style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow: var(--shadow);">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:14px;">
+          <div>
+            <label for="firstname">First Name:</label>
+            <input type="text" id="firstname" name="firstname" required />
+          </div>
+
+          <div>
+            <label for="middlename">Middle Name:</label>
+            <input type="text" id="middlename" name="middlename" />
+          </div>
+
+          <div>
+            <label for="lastname">Last Name:</label>
+            <input type="text" id="lastname" name="lastname" required />
+          </div>
+
+          <div>
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required />
+          </div>
+
+          <div>
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div>
+            <label for="nationality">Nationality:</label>
+            <select id="nationality" name="nationality" required>
+              <option value="">-- Select --</option>
+              <option value="American">American</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="passport">Passport Number:</label>
+            <input type="text" id="passport" name="passport" required />
+          </div>
+
+          <div style="grid-column:1/-1;">
+            <!-- Match server 5MB limit -->
+            <label for="passportFile">Upload Passport Bio Page (PDF or Image, max 5MB):</label>
+            <input type="file" id="passportFile" name="passportFile" accept=".pdf, image/*" required />
+          </div>
+        </div>
+
+        <p style="margin-top:18px; font-size:.95rem; color:#555;">
+          <strong>Note:</strong> You will proceed to pay the <strong>$150 visa fee</strong> before final submission.
+        </p>
+
+        <button type="button" id="proceedToPayment" class="btn" style="width:100%; margin-top:18px;">
+          Proceed to Payment
+        </button>
+      </form>
+
+      <!-- Helpful info card -->
+      <aside style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
+        <h3 style="margin-top:0; color:#004080;">Tips for a Smooth Application</h3>
+        <ul style="margin:10px 0 0 18px; color:#555;">
+          <li>Make sure your passport has at least 6 months validity.</li>
+          <li>Upload a clear, readable scan/photo of your bio page.</li>
+          <li>Use an email you check frequently for updates.</li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ECOWAS Visa-Free Notice -->
+  <section class="form-container" style="max-width:900px;">
     <div class="ecowas-notice">
       <p><strong>Citizens of these 14 ECOWAS (West African) nations can enter Liberia visa-free:</strong></p>
       <div class="ecowas-table">
@@ -41,45 +132,9 @@
         <div><img src="images/flags/togo.png" alt="Togo Flag"> Togo</div>
       </div>
     </div>
+  </section>
 
-    <!-- Application Form -->
-    <h2>Visa Application Form</h2>
-    <form id="applicationForm" enctype="multipart/form-data">
-      <label for="firstname">First Name:</label>
-      <input type="text" id="firstname" name="firstname" required />
-
-      <label for="middlename">Middle Name:</label>
-      <input type="text" id="middlename" name="middlename" />
-
-      <label for="lastname">Last Name:</label>
-      <input type="text" id="lastname" name="lastname" required />
-
-      <label for="dob">Date of Birth:</label>
-      <input type="date" id="dob" name="dob" required />
-
-      <label for="email">Email Address:</label>
-      <input type="email" id="email" name="email" required />
-
-      <label for="nationality">Nationality:</label>
-      <select id="nationality" name="nationality" required>
-        <option value="">-- Select --</option>
-        <option value="American">American</option>
-      </select>
-
-      <label for="passport">Passport Number:</label>
-      <input type="text" id="passport" name="passport" required />
-
-      <!-- CHANGED: text to 5MB to match server limit -->
-      <label for="passportFile">Upload Passport Bio Page (PDF or Image, max 5MB):</label>
-      <input type="file" id="passportFile" name="passportFile" accept=".pdf, image/*" required />
-
-      <p style="margin-top: 20px; font-size: 0.9rem; color: #555;"><strong>Note:</strong> You will proceed to pay the <strong>$150 visa fee</strong> before final submission.</p>
-
-      <button type="button" id="proceedToPayment" class="btn">Proceed to Payment</button>
-    </form>
-  </main>
-
-  <!-- Visa Requirements Section -->
+  <!-- Visa Requirements -->
   <section id="requirements" class="info-section">
     <h2>Visa Requirements</h2>
     <ul>
@@ -90,7 +145,7 @@
     </ul>
   </section>
 
-  <!-- Contact Section -->
+  <!-- Contact -->
   <section id="contact" class="info-section">
     <h2>Contact Us</h2>
     <p><strong>Email:</strong> easyvisa2liberia@gmail.com</p>
@@ -98,7 +153,7 @@
     <p><strong>Hours:</strong> Monday – Friday, 9am – 5pm EST</p>
   </section>
 
-  <!-- CHANGED: add cache-busting query so the new JS (that sends appNumber) is guaranteed to load -->
+  <!-- Keep the cache-busting flag you already use -->
   <script src="js/script.js?v=2"></script>
 </body>
 </html>
