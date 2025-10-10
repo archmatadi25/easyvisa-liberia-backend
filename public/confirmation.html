@@ -8,27 +8,61 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- Header -->
   <header>
-    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="#requirements">Requirements</a></li>
-        <li><a href="track.html">Track Application</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+      <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <!-- Link anchors point to the Application page sections -->
+          <li><a href="application.html#requirements">Requirements</a></li>
+          <li><a href="track.html">Track Application</a></li>
+          <li><a href="application.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main class="form-container">
-    <h2>Application Submitted</h2>
-    <p>Thank you for applying for a Liberian visa.</p>
-    <p>Your unique application number is:</p>
-    <h1 id="appNumber" style="text-align: center; font-size: 2rem; letter-spacing: 2px;"></h1>
-    <p style="text-align:center; margin-top: 20px;">
-      Please save this number along with your <strong>last name</strong> to track your application.
-    </p>
+  <!-- Success Panel -->
+  <main class="form-container" style="max-width:720px; text-align:center;">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
+      <!-- Success badge -->
+      <div style="width:72px; height:72px; border-radius:50%; background:#e6ffed; display:flex; align-items:center; justify-content:center;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M20 7L9 18l-5-5" stroke="#1b7f2a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <h2 style="margin:0;">Application Submitted</h2>
+      <p style="color:#555; margin:0 0 6px 0;">Thank you for applying for a Liberian visa.</p>
+      <p style="color:#555; margin:0;">Your unique application number is:</p>
+
+      <!-- App Number (kept same ID for JS) -->
+      <h1 id="appNumber" style="font-size:2rem; letter-spacing:2px; margin:6px 0 4px 0;"></h1>
+
+      <p style="color:#555; max-width:560px;">
+        Please save this number along with your <strong>last name</strong>. You’ll need both to
+        <a href="track.html" style="color:#004080; font-weight:600;">track your application</a>.
+      </p>
+
+      <!-- Quick Actions -->
+      <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+        <a href="track.html" class="btn">Track Application</a>
+        <a href="index.html" class="btn" style="background:#555;">Back to Home</a>
+      </div>
+    </div>
   </main>
+
+  <!-- Helpful next steps -->
+  <section class="info-section" style="max-width:720px;">
+    <h2>What’s Next?</h2>
+    <ul>
+      <li>We’ll review your application and email you if additional information is required.</li>
+      <li>Typical processing time is 3–7 business days.</li>
+      <li>You can check progress anytime on the <a href="track.html" style="color:#004080; font-weight:600;">Track Application</a> page.</li>
+    </ul>
+  </section>
 
   <script src="js/script.js"></script>
 </body>
