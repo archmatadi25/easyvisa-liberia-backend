@@ -8,21 +8,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- Header -->
   <header>
-    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <!-- FIXED links to correct anchors on application.html -->
-        <li><a href="application.html#requirements">Requirements</a></li>
-        <li><a href="track.html">Track Application</a></li>
-        <li><a href="application.html#contact">Contact</a></li>
-      </ul>
-    </nav>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+      <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="application.html#requirements">Requirements</a></li>
+          <li><a href="track.html">Track Application</a></li>
+          <li><a href="application.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main class="form-container">
-    <h2>Track Your Application</h2>
+  <!-- Hero / Context -->
+  <section class="container" style="max-width:900px; text-align:center; margin-top:40px;">
+    <h1 style="font-size:2rem; color:#004080; margin-bottom:8px;">Track Your Visa Application</h1>
+    <p style="color:#555; max-width:640px; margin:0 auto;">
+      Enter your <strong>Application Number</strong> and <strong>Last Name</strong> below to check your current visa application status in real-time.
+    </p>
+  </section>
+
+  <!-- Form -->
+  <main class="form-container" style="max-width:700px;">
     <form id="trackForm">
       <label for="trackNumber">Application Number:</label>
       <input
@@ -46,12 +56,19 @@
         class="uppercase-input"
       />
 
-      <button type="submit" class="btn">Track</button>
+      <button type="submit" class="btn" style="width:100%; margin-top:20px;">Track Application</button>
     </form>
 
     <div id="result"></div>
     <div id="error"></div>
   </main>
+
+  <!-- Help / Tips -->
+  <section class="info-section" style="max-width:700px;">
+    <h2>Need Help?</h2>
+    <p>If your application cannot be found, please ensure your details are entered exactly as submitted.</p>
+    <p>You can also <a href="application.html" style="color:#004080; font-weight:600;">reapply</a> or <a href="application.html#contact" style="color:#004080; font-weight:600;">contact us</a> for assistance.</p>
+  </section>
 
   <script src="js/script.js"></script>
 </body>
