@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const session = require('express-session');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
@@ -13,16 +14,16 @@ const PORT = process.env.PORT || 5050;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 const REQUIRE_PAYMENT = process.env.REQUIRE_PAYMENT !== 'false'; // default: true
 
-// Keep track of paid applications via Stripe metadata -> webhook
+// Track paid applications (via Stripe metadata + webhook)
 const paidApps = new Set();
 
-// Ensure uploads dir exists
+// Ensure uploads directory exists
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
-// Trust Render’s proxy (needed for secure cookies, protocol checks)
+// Trust Render’s proxy (for secure cookies, HTTPS)
 app.set('trust proxy', 1);
 
 // Security headers
@@ -34,14 +35,14 @@ app.use(
         "script-src": ["'self'", "https://js.stripe.com"],
         "frame-src": ["'self'", "https://js.stripe.com"],
         "connect-src": ["'self'", "https://api.stripe.com"],
-        "img-src": ["'self'", "data:"],
-      },
+        "img-src": ["'self'", "data:"]
+      }
     },
-    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" }
   })
 );
 
-// Optional: force HTTPS in production
+// Enforce HTTPS in production
 app.use((req, res, next) => {
   if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
     return res.redirect(301, `https://${req.headers.host}${req.url}`);
@@ -57,11 +58,11 @@ app.use(session({
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production' // requires HTTPS
+    secure: process.env.NODE_ENV === 'production'
   }
 }));
 
-// Multer (file uploads)
+// === Multer setup with file size/type limits ===
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
   filename: (_req, file, cb) => {
@@ -70,22 +71,54 @@ const storage = multer.diskStorage({
     cb(null, `${file.fieldname}-${unique}${ext}`);
   }
 });
-const upload = multer({ storage });
 
-// Body parsers (JSON, forms) — NOTE: Stripe webhook uses raw parser below
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB limit
+const allowedMime = new Set(['application/pdf', 'image/jpeg', 'image/png']);
 
-// Health check for Render
+const upload = multer({
+  storage,
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (_req, file, cb) => {
+    if (allowedMime.has(file.mimetype)) return cb(null, true);
+    return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Only PDF, JPG, and PNG files are allowed.'));
+  }
+});
+
+// === Rate Limiters ===
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many uploads, please try again later.' }
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many login attempts. Try again later.' }
+});
+
+const checkoutLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many payment requests. Please slow down.' }
+});
+
+// ✅ Health check for Render
 app.get('/healthz', (_req, res) => res.status(200).send('ok'));
 
-// Auth gate for admin APIs
+// Auth middleware for admin routes
 function isAuthenticated(req, res, next) {
   if (req.session && req.session.loggedIn) return next();
   return res.status(403).json({ message: 'Forbidden – Admin not logged in' });
 }
 
-// Protect /dashboard.html
+// Protect dashboard
 app.get('/dashboard.html', (req, res) => {
   if (req.session && req.session.loggedIn) {
     return res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
@@ -98,9 +131,8 @@ app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Create Stripe Checkout Session
-// Accepts email and (recommended) appNumber — we store appNumber in session metadata
-app.post('/create-checkout-session', async (req, res) => {
+// === Stripe Checkout Session ===
+app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
   const { email, appNumber } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required' });
 
@@ -120,7 +152,7 @@ app.post('/create-checkout-session', async (req, res) => {
         },
         quantity: 1
       }],
-      metadata: appNumber ? { appNumber } : {}, // helps the webhook link payment -> application
+      metadata: appNumber ? { appNumber } : {},
       success_url: `${BASE_URL}/success.html`,
       cancel_url: `${BASE_URL}/application.html`
     });
@@ -132,13 +164,9 @@ app.post('/create-checkout-session', async (req, res) => {
   }
 });
 
-/**
- * Stripe Webhook
- * IMPORTANT: must use raw body for signature verification.
- * In Stripe Dashboard, set endpoint to: https://YOUR_DOMAIN/api/stripe/webhook
- * Subscribe at least to: checkout.session.completed
- */
-app.post('/api/stripe/webhook',
+// === Stripe Webhook ===
+app.post(
+  '/api/stripe/webhook',
   express.raw({ type: 'application/json' }),
   (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -155,15 +183,12 @@ app.post('/api/stripe/webhook',
       return res.sendStatus(400);
     }
 
-    // Handle successful checkout
     if (event.type === 'checkout.session.completed') {
       const sessionObj = event.data.object;
       const meta = sessionObj.metadata || {};
       if (meta.appNumber) {
         paidApps.add(meta.appNumber.toUpperCase());
         console.log(`💸 Marked paid: ${meta.appNumber}`);
-      } else {
-        console.warn('checkout.session.completed without appNumber metadata');
       }
     }
 
@@ -171,19 +196,16 @@ app.post('/api/stripe/webhook',
   }
 );
 
-// IMPORTANT: after the webhook route, restore JSON parser for remaining routes
+// ✅ Body parsers AFTER webhook
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Submit visa application (requires payment if REQUIRE_PAYMENT=true)
-let applications = []; // In-memory (replace with DB for production)
+// === Application submission ===
+let applications = []; // in-memory
 
-app.post('/submit', upload.single('passportFile'), async (req, res) => {
+app.post('/submit', uploadLimiter, upload.single('passportFile'), async (req, res) => {
   try {
-    const {
-      firstname, middlename, lastname, email, dob,
-      nationality, passport, appNumber
-    } = req.body;
+    const { firstname, middlename, lastname, email, dob, nationality, passport, appNumber } = req.body;
 
     if (!firstname || !lastname || !email || !appNumber) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -208,13 +230,9 @@ app.post('/submit', upload.single('passportFile'), async (req, res) => {
       status: 'Pending Review'
     });
 
-    // Email confirmation (use an App Password if Gmail)
     const transporter = nodemailer.createTransport({
       service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD
-      }
+      auth: { user: process.env.EMAIL_USERNAME, pass: process.env.EMAIL_PASSWORD }
     });
 
     await transporter.sendMail({
@@ -238,11 +256,11 @@ EasyVisa Liberia`
   }
 });
 
-// Admin login/logout
+// === Admin login/logout ===
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
 
-app.post('/admin/login', (req, res) => {
+app.post('/admin/login', loginLimiter, (req, res) => {
   const { username, password } = req.body;
   if (username === ADMIN_USER && password === ADMIN_PASS) {
     req.session.loggedIn = true;
@@ -262,7 +280,7 @@ app.post('/admin/logout', (req, res) => {
   });
 });
 
-// Admin endpoints
+// === Admin endpoints ===
 app.get('/admin/applications', isAuthenticated, (_req, res) => {
   const sanitized = applications.map(app => ({
     appNumber: app.appNumber,
@@ -285,7 +303,7 @@ app.post('/admin/update-status', isAuthenticated, (req, res) => {
   return res.sendStatus(200);
 });
 
-// Tracking
+// === Tracking ===
 app.post('/track', (req, res) => {
   const { appNumber, lastName } = req.body;
   if (!appNumber || !lastName) {
@@ -306,12 +324,19 @@ app.post('/track', (req, res) => {
   return res.status(404).json({ message: 'Application not found' });
 });
 
+// === Multer error handler ===
+app.use((err, _req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ message: 'File too large. Max 5MB allowed.' });
+    }
+    return res.status(400).json({ message: err.message || 'Invalid file upload.' });
+  }
+  return next(err);
+});
+
 // Static files
-app.use(express.static(path.join(__dirname, 'public'), {
-  // cache static assets; keep HTML un-cached on front-end if needed
-  maxAge: '1y',
-  etag: true
-}));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1y', etag: true }));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 // 404
