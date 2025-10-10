@@ -69,7 +69,8 @@
       <label for="passport">Passport Number:</label>
       <input type="text" id="passport" name="passport" required />
 
-      <label for="passportFile">Upload Passport Bio Page (PDF or Image, max 10MB):</label>
+      <!-- CHANGED: text to 5MB to match server limit -->
+      <label for="passportFile">Upload Passport Bio Page (PDF or Image, max 5MB):</label>
       <input type="file" id="passportFile" name="passportFile" accept=".pdf, image/*" required />
 
       <p style="margin-top: 20px; font-size: 0.9rem; color: #555;"><strong>Note:</strong> You will proceed to pay the <strong>$150 visa fee</strong> before final submission.</p>
@@ -85,7 +86,7 @@
       <li>Completed Visa Application Form</li>
       <li>Valid Passport (minimum 6 months validity)</li>
       <li>Payment of visa fees (non-refundable)</li>
-      <li>Upload of passport bio page (PDF or image under 10MB)</li>
+      <li>Upload of passport bio page (PDF or image under 5MB)</li>
     </ul>
   </section>
 
@@ -97,6 +98,7 @@
     <p><strong>Hours:</strong> Monday – Friday, 9am – 5pm EST</p>
   </section>
 
-  <script src="js/script.js"></script>
+  <!-- CHANGED: add cache-busting query so the new JS (that sends appNumber) is guaranteed to load -->
+  <script src="js/script.js?v=2"></script>
 </body>
 </html>
