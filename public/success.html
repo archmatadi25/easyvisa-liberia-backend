@@ -6,67 +6,92 @@
   <title>Processing Application – EasyVisa Liberia</title>
   <link rel="stylesheet" href="css/style.css" />
   <style>
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 70vh;
+    .loading-wrap {
+      max-width: 720px;
+      margin: 80px auto;
+      padding: 28px 24px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.08);
       text-align: center;
-      padding: 24px;
     }
-    .spinner {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #004080;
+    .loader {
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
+      border: 6px solid #f0f2f7;
+      border-top-color: #004080;
+      margin: 20px auto 12px;
       animation: spin 1s linear infinite;
-      margin: 20px 0;
     }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .muted { color:#667085; font-size:.95rem; }
+    .actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:14px; }
+    .link-btn { text-decoration:none; padding:10px 16px; border-radius:6px; border:1px solid #d0d5dd; color:#344054; }
+    .link-btn:hover { background:#f9fafb; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display:none; }
+    .error-msg { color:#a10000; background:#ffe6e6; border:1px solid #ffcccc; padding:10px 12px; border-radius:8px; margin-top:10px; }
   </style>
 </head>
 <body>
-  <!-- Header + Nav (links jump to sections on application.html) -->
+  <!-- Header -->
   <header>
-    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="application.html#requirements">Requirements</a></li>
-        <li><a href="track.html">Track Application</a></li>
-        <li><a href="application.html#contact">Contact</a></li>
-      </ul>
-    </nav>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between;">
+      <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="application.html#requirements">Requirements</a></li>
+          <li><a href="track.html">Track Application</a></li>
+          <li><a href="application.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <!-- Loading / auto-submit -->
-  <main class="loading-container">
-    <h2>Processing your application...</h2>
-    <div class="spinner"></div>
-    <p>Please wait, this may take a few seconds.</p>
+  <!-- Processing Panel -->
+  <main class="loading-wrap" aria-busy="true" aria-live="polite">
+    <h2 style="margin:0;">Processing your application…</h2>
+    <div class="loader" role="progressbar" aria-label="Submitting your application"></div>
+    <p class="muted" id="statusText">Please wait a few seconds while we finalize your submission.</p>
+
+    <!-- Error area (hidden by default) -->
+    <div id="submitError" class="error-msg hidden"></div>
+
+    <!-- Helpful actions -->
+    <div class="actions">
+      <a href="application.html" class="link-btn">Back to Application</a>
+      <a href="index.html" class="link-btn">Home</a>
+    </div>
+    <noscript>
+      <p class="error-msg" style="margin-top:16px;">JavaScript is required to complete your submission.</p>
+    </noscript>
   </main>
 
   <script>
-    // Helper: convert base64 to Blob
+    // Convert base64 (Data URL) to Blob
     function dataURLToBlob(dataURL) {
       const parts = dataURL.split(',');
       const mime = parts[0].match(/:(.*?);/)[1];
       const binary = atob(parts[1]);
-      const u8arr = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) u8arr[i] = binary.charCodeAt(i);
-      return new Blob([u8arr], { type: mime });
+      const u8 = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) u8[i] = binary.charCodeAt(i);
+      return new Blob([u8], { type: mime });
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    async function finalize() {
+      const statusText = document.getElementById('statusText');
+      const errBox = document.getElementById('submitError');
+
       const data = JSON.parse(localStorage.getItem('pendingApplication'));
       const base64 = localStorage.getItem('passportFileBase64');
       const filename = localStorage.getItem('passportFileName');
 
       if (!data) {
-        alert("Application data missing. Please resubmit.");
-        window.location.href = "application.html";
+        errBox.textContent = "Application data not found. Please resubmit your form.";
+        errBox.classList.remove('hidden');
+        statusText.textContent = "Redirecting you back to the form…";
+        setTimeout(() => (window.location.href = "application.html"), 1500);
         return;
       }
 
@@ -74,11 +99,17 @@
       Object.keys(data).forEach(k => formData.append(k, data[k]));
 
       if (base64 && filename) {
-        const fileBlob = dataURLToBlob(base64);
-        formData.append('passportFile', fileBlob, filename);
+        try {
+          const fileBlob = dataURLToBlob(base64);
+          formData.append('passportFile', fileBlob, filename);
+        } catch (e) {
+          // Non-fatal: continue without a file if conversion fails
+          console.warn("Failed to attach file from localStorage:", e);
+        }
       }
 
       try {
+        statusText.textContent = "Submitting your application…";
         const res = await fetch("/submit", { method: "POST", body: formData });
 
         if (res.ok) {
@@ -86,18 +117,25 @@
           localStorage.removeItem("pendingApplication");
           localStorage.removeItem("passportFileBase64");
           localStorage.removeItem("passportFileName");
+          statusText.textContent = "Submission complete! Redirecting…";
           window.location.href = "confirmation.html";
         } else {
           const r = await res.json().catch(() => ({}));
-          alert(r.message || "There was a problem submitting your application. Please try again.");
-          window.location.href = "application.html";
+          errBox.textContent = r.message || "There was a problem submitting your application. Please try again.";
+          errBox.classList.remove('hidden');
+          statusText.textContent = "We couldn't finalize your application.";
+          setTimeout(() => (window.location.href = "application.html"), 2000);
         }
       } catch (err) {
         console.error("Submission error:", err);
-        alert("Something went wrong while finalizing your application.");
-        window.location.href = "application.html";
+        errBox.textContent = "Network or server error. Please try again.";
+        errBox.classList.remove('hidden');
+        statusText.textContent = "We couldn't reach the server.";
+        setTimeout(() => (window.location.href = "application.html"), 2000);
       }
-    });
+    }
+
+    document.addEventListener('DOMContentLoaded', finalize);
   </script>
 </body>
 </html>
