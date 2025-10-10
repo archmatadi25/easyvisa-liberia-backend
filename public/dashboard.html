@@ -3,79 +3,251 @@
 <head>
   <meta charset="UTF-8" />
   <title>Admin Dashboard – EasyVisa Liberia</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
   <style>
+    /* Page shell */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
+    header .logo { height: 40px; }
+    header nav ul {
+      display: flex;
+      gap: 16px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    header nav a { text-decoration: none; color: #0a2540; }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
     .logout-btn {
-      float: right;
-      margin-top: -50px;
       background-color: #a10000;
     }
     .logout-btn:hover {
       background-color: #800000;
     }
 
-    .status-select {
-      padding: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+    /* Stat cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin: 12px 0 18px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      padding: 16px;
+    }
+    .card h3 {
+      margin: 0 0 6px;
+      font-size: .95rem;
+      color: #546E7A;
+    }
+    .card .num {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0a2540;
     }
 
-    .app-table-wrapper {
-      display: flex;
-      justify-content: center;
-      padding: 30px 20px;
+    /* Filters/search */
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 200px 140px;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .filters input, .filters select {
+      padding: 10px 12px;
+      border: 1px solid #ccd6dd;
+      border-radius: 10px;
+      font-size: 1rem;
     }
 
-    .app-table {
+    /* Table */
+    .table-box {
+      overflow: auto;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    }
+    table {
       width: 100%;
-      max-width: 1200px;
       border-collapse: collapse;
-      background-color: #fff;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      min-width: 900px;
     }
-
-    .app-table th,
-    .app-table td {
+    th, td {
       padding: 12px;
-      border: 1px solid #ccc;
+      border-bottom: 1px solid #eef2f5;
       text-align: left;
+      vertical-align: middle;
+    }
+    th { background: #f7f9fb; color: #0a2540; }
+    tr:hover { background: #fafcff; }
+
+    /* Badges + status select */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+    .b-pending { background: #fff3cd; color: #8a6d3b; }
+    .b-approved { background: #e2f3e6; color: #2e7d32; }
+    .b-rejected { background: #fde2e2; color: #b71c1c; }
+
+    .status-select {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #ccd6dd;
+      font-size: .95rem;
+      background: #fff;
+    }
+    .action-btn {
+      padding: 8px 12px;
+      border: 0;
+      border-radius: 8px;
+      background: #004080;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    .app-table th {
-      background-color: #f0f0f0;
+    /* Pagination */
+    .pagination {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      padding: 12px;
+    }
+    .pagination button {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccd6dd;
+      background: #fff;
+      cursor: pointer;
+    }
+    .pagination button.active {
+      background: #004080;
+      color: #fff;
+      border-color: #004080;
     }
 
-    .success-msg {
-      color: green;
-      margin-top: 10px;
+    /* Messages */
+    .msg {
+      margin: 10px 0;
       text-align: center;
+      font-weight: 600;
+    }
+    .msg.success { color: #1b5e20; }
+    .msg.error { color: #b00020; }
+
+    /* Small helpers */
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .copy {
+      background: #eef2f5; border: 1px solid #ccd6dd; border-radius: 8px;
+      padding: 6px 8px; cursor: pointer; font-size: .85rem;
+    }
+    .empty {
+      text-align: center; color: #546E7A; padding: 20px;
     }
 
-    .error-msg {
-      color: red;
-      margin-top: 10px;
-      text-align: center;
+    @media (max-width: 900px) {
+      .cards { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .filters { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <main class="form-container">
-    <h2>Admin Dashboard</h2>
-    <button class="btn logout-btn" id="logoutBtn">Logout</button>
+  <header>
+    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="application.html#requirements">Requirements</a></li>
+        <li><a href="track.html">Track Application</a></li>
+        <li><a href="application.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <!-- 🔍 Search Bar -->
-    <input type="text" id="searchInput" placeholder="Search by name, email, or passport..." style="width: 100%; padding: 10px; margin: 20px 0; border: 1px solid #ccc; border-radius: 5px;">
-
-    <!-- ✅ Centered table wrapper -->
-    <div class="app-table-wrapper">
-      <div id="appTableContainer">
-        <p>Loading applications...</p>
-      </div>
+  <div class="wrap">
+    <div class="topbar">
+      <h2 style="margin:0;">Admin Dashboard</h2>
+      <button class="btn logout-btn" id="logoutBtn">Logout</button>
     </div>
 
-    <p id="statusMsg" class="success-msg" style="display:none;"></p>
-  </main>
+    <!-- Stats -->
+    <div class="cards">
+      <div class="card"><h3>Total</h3><div class="num" id="statTotal">0</div></div>
+      <div class="card"><h3>Pending</h3><div class="num" id="statPending">0</div></div>
+      <div class="card"><h3>Approved</h3><div class="num" id="statApproved">0</div></div>
+      <div class="card"><h3>Rejected</h3><div class="num" id="statRejected">0</div></div>
+    </div>
 
-  <script src="js/dashboard.js"></script>
+    <!-- Filters -->
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search by name, email, passport, or app #" />
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option value="Pending Review">Pending Review</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+      <select id="pageSize">
+        <option value="10">10 / page</option>
+        <option value="20">20 / page</option>
+        <option value="50">50 / page</option>
+      </select>
+    </div>
+
+    <div id="statusMsg" class="msg" style="display:none;"></div>
+
+    <!-- Table -->
+    <div class="table-box" id="appTableContainer">
+      <table id="appTable">
+        <thead>
+          <tr>
+            <th>App #</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Nationality</th>
+            <th>Passport #</th>
+            <th>File</th>
+            <th>Current Status</th>
+            <th>Set Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="appTbody">
+          <tr><td colspan="9" class="empty">Loading applications…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagi" class="pagination" style="display:none;"></div>
+  </div>
+
+  <script src="js/dashboard.js?v=2"></script>
 </body>
 </html>
