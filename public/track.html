@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Track Your Application – EasyVisa Liberia</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header>
+    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#requirements">Requirements</a></li>
+        <li><a href="track.html">Track Application</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="form-container">
+    <h2>Track Your Application</h2>
+    <form id="trackForm">
+      <label for="trackNumber">Application Number:</label>
+      <input
+        type="text"
+        id="trackNumber"
+        name="trackNumber"
+        required
+        pattern="[A-Z0-9]{12,16}"
+        title="12 to 16 uppercase alphanumeric characters"
+        class="uppercase-input"
+      />
+
+      <label for="trackLastName">Last Name:</label>
+      <input
+        type="text"
+        id="trackLastName"
+        name="trackLastName"
+        required
+        pattern="[A-Za-z]{2,}"
+        title="Last name must be at least 2 letters"
+        class="uppercase-input"
+      />
+
+      <button type="submit" class="btn">Track</button>
+    </form>
+
+    <div id="result"></div>
+    <div id="error"></div>
+  </main>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

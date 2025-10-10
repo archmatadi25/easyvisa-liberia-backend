@@ -1,0 +1,25 @@
+{
+  "name": "easyvisaapp-backend",
+  "version": "1.0.0",
+  "description": "EasyVisa Liberia backend server for visa applications, payments, and admin dashboard.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo \"(no build step needed)\"",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "author": "Patrick A. Naipala",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "helmet": "^7.1.0",
+    "multer": "^2.0.1",
+    "nodemailer": "^7.0.4",
+    "stripe": "^18.3.0"
+  }
+}

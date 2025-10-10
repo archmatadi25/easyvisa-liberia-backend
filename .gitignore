@@ -1,0 +1,17 @@
+# dependencies
+node_modules
+
+# env & secrets
+.env
+
+# build/output caches
+dist
+.build
+.cache
+
+# uploads (store on Render disk, not in git)
+uploads/*
+!uploads/.gitkeep
+
+# OS noise
+.DS_Store

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Visa Application – EasyVisa Liberia</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header>
+    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#requirements">Requirements</a></li>
+        <li><a href="track.html">Track Application</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="form-container">
+    <!-- ECOWAS Visa-Free Notice -->
+    <div class="ecowas-notice">
+      <p><strong>Citizens of these 14 ECOWAS (West African) nations can enter Liberia visa-free:</strong></p>
+      <div class="ecowas-table">
+        <div><img src="images/flags/benin.png" alt="Benin Flag"> Benin</div>
+        <div><img src="images/flags/burkina-faso.png" alt="Burkina Faso Flag"> Burkina Faso</div>
+        <div><img src="images/flags/cape-verde.png" alt="Cape Verde Flag"> Cape Verde</div>
+        <div><img src="images/flags/ivory-coast.png" alt="Côte d’Ivoire Flag"> Côte d’Ivoire</div>
+        <div><img src="images/flags/gambia.png" alt="Gambia Flag"> Gambia</div>
+        <div><img src="images/flags/ghana.png" alt="Ghana Flag"> Ghana</div>
+        <div><img src="images/flags/guinea.png" alt="Guinea Flag"> Guinea</div>
+        <div><img src="images/flags/guinea-bissau.png" alt="Guinea-Bissau Flag"> Guinea-Bissau</div>
+        <div><img src="images/flags/mali.png" alt="Mali Flag"> Mali</div>
+        <div><img src="images/flags/niger.png" alt="Niger Flag"> Niger</div>
+        <div><img src="images/flags/nigeria.png" alt="Nigeria Flag"> Nigeria</div>
+        <div><img src="images/flags/senegal.png" alt="Senegal Flag"> Senegal</div>
+        <div><img src="images/flags/sierra-leone.png" alt="Sierra Leone Flag"> Sierra Leone</div>
+        <div><img src="images/flags/togo.png" alt="Togo Flag"> Togo</div>
+      </div>
+    </div>
+
+    <!-- Application Form -->
+    <h2>Visa Application Form</h2>
+    <form id="applicationForm" enctype="multipart/form-data">
+      <label for="firstname">First Name:</label>
+      <input type="text" id="firstname" name="firstname" required />
+
+      <label for="middlename">Middle Name:</label>
+      <input type="text" id="middlename" name="middlename" />
+
+      <label for="lastname">Last Name:</label>
+      <input type="text" id="lastname" name="lastname" required />
+
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" name="dob" required />
+
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="nationality">Nationality:</label>
+      <select id="nationality" name="nationality" required>
+        <option value="">-- Select --</option>
+        <option value="American">American</option>
+      </select>
+
+      <label for="passport">Passport Number:</label>
+      <input type="text" id="passport" name="passport" required />
+
+      <label for="passportFile">Upload Passport Bio Page (PDF or Image, max 10MB):</label>
+      <input type="file" id="passportFile" name="passportFile" accept=".pdf, image/*" required />
+
+      <p style="margin-top: 20px; font-size: 0.9rem; color: #555;"><strong>Note:</strong> You will proceed to pay the <strong>$150 visa fee</strong> before final submission.</p>
+
+      <button type="button" id="proceedToPayment" class="btn">Proceed to Payment</button>
+    </form>
+  </main>
+
+  <!-- Visa Requirements Section -->
+  <section id="requirements" class="info-section">
+    <h2>Visa Requirements</h2>
+    <ul>
+      <li>Completed Visa Application Form</li>
+      <li>Valid Passport (minimum 6 months validity)</li>
+      <li>Payment of visa fees (non-refundable)</li>
+      <li>Upload of passport bio page (PDF or image under 10MB)</li>
+    </ul>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="info-section">
+    <h2>Contact Us</h2>
+    <p><strong>Email:</strong> easyvisa2liberia@gmail.com</p>
+    <p><strong>Phone:</strong> +1 (612) 470-6846</p>
+    <p><strong>Hours:</strong> Monday – Friday, 9am – 5pm EST</p>
+  </section>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

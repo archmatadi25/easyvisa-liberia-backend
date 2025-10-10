@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login – EasyVisa Liberia</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="form-container">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <label for="adminUsername">Username:</label>
+      <input type="text" id="adminUsername" required />
+
+      <label for="adminPassword">Password:</label>
+      <input type="password" id="adminPassword" required />
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+    <p id="loginError" style="color: red; display: none;"></p>
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

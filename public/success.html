@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Processing Application – EasyVisa Liberia</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 80vh;
+      text-align: center;
+    }
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #004080;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px 0;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-container">
+    <h2>Processing your application...</h2>
+    <div class="spinner"></div>
+    <p>Please wait, this may take a few seconds.</p>
+  </div>
+
+  <script>
+    // Helper: convert base64 to Blob
+    function dataURLToBlob(dataURL) {
+      const parts = dataURL.split(',');
+      const mime = parts[0].match(/:(.*?);/)[1];
+      const binary = atob(parts[1]);
+      let len = binary.length;
+      const u8arr = new Uint8Array(len);
+      while (len--) u8arr[len] = binary.charCodeAt(len);
+      return new Blob([u8arr], { type: mime });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const data = JSON.parse(localStorage.getItem('pendingApplication'));
+      const base64 = localStorage.getItem('passportFileBase64');
+      const filename = localStorage.getItem('passportFileName');
+
+      if (!data) {
+        alert("Application data missing. Please resubmit.");
+        window.location.href = "application.html";
+        return;
+      }
+
+      const formData = new FormData();
+      for (const key in data) {
+        formData.append(key, data[key]);
+      }
+
+      if (base64 && filename) {
+        const fileBlob = dataURLToBlob(base64);
+        formData.append('passportFile', fileBlob, filename);
+      }
+
+      try {
+        const res = await fetch("/submit", {
+          method: "POST",
+          body: formData
+        });
+
+        if (res.ok) {
+          localStorage.setItem("latestApplication", JSON.stringify(data));
+          localStorage.removeItem("pendingApplication");
+          localStorage.removeItem("passportFileBase64");
+          localStorage.removeItem("passportFileName");
+          window.location.href = "confirmation.html";
+        } else {
+          alert("There was a problem submitting your application. Please try again.");
+          window.location.href = "application.html";
+        }
+      } catch (err) {
+        console.error("Submission error:", err);
+        alert("Something went wrong while finalizing your application.");
+        window.location.href = "application.html";
+      }
+    });
+  </script>
+</body>
+</html>

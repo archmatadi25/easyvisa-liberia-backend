@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard – EasyVisa Liberia</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .logout-btn {
+      float: right;
+      margin-top: -50px;
+      background-color: #a10000;
+    }
+    .logout-btn:hover {
+      background-color: #800000;
+    }
+
+    .status-select {
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .app-table-wrapper {
+      display: flex;
+      justify-content: center;
+      padding: 30px 20px;
+    }
+
+    .app-table {
+      width: 100%;
+      max-width: 1200px;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .app-table th,
+    .app-table td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    .app-table th {
+      background-color: #f0f0f0;
+    }
+
+    .success-msg {
+      color: green;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .error-msg {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="form-container">
+    <h2>Admin Dashboard</h2>
+    <button class="btn logout-btn" id="logoutBtn">Logout</button>
+
+    <!-- 🔍 Search Bar -->
+    <input type="text" id="searchInput" placeholder="Search by name, email, or passport..." style="width: 100%; padding: 10px; margin: 20px 0; border: 1px solid #ccc; border-radius: 5px;">
+
+    <!-- ✅ Centered table wrapper -->
+    <div class="app-table-wrapper">
+      <div id="appTableContainer">
+        <p>Loading applications...</p>
+      </div>
+    </div>
+
+    <p id="statusMsg" class="success-msg" style="display:none;"></p>
+  </main>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
