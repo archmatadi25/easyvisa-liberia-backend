@@ -72,7 +72,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB limit
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const allowedMime = new Set(['application/pdf', 'image/jpeg', 'image/png']);
 
 const upload = multer({
@@ -80,6 +80,7 @@ const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (_req, file, cb) => {
     if (allowedMime.has(file.mimetype)) return cb(null, true);
+    // Use a MulterError so our Multer error handler catches it cleanly
     return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Only PDF, JPG, and PNG files are allowed.'));
   }
 });
@@ -131,38 +132,48 @@ app.get('/', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// === Stripe Checkout Session ===
-app.post('/create-checkout-session', checkoutLimiter, async (req, res) => {
-  const { email, appNumber } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
+/**
+ * === Stripe Checkout Session ===
+ * IMPORTANT: Global parsers are mounted AFTER the webhook.
+ * So we attach route-specific parsers here to ensure req.body exists.
+ */
+app.post(
+  '/create-checkout-session',
+  checkoutLimiter,
+  express.json(),
+  express.urlencoded({ extended: true }),
+  async (req, res) => {
+    try {
+      const { email, appNumber } = req.body || {};
+      if (!email) return res.status(400).json({ error: 'Email is required' });
 
-  try {
-    const sessionObj = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      payment_method_types: ['card'],
-      customer_email: email,
-      line_items: [{
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'Liberia Visa Application Fee',
-            description: 'Required for processing your visa application'
+      const sessionObj = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        customer_email: email,
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Liberia Visa Application Fee',
+              description: 'Required for processing your visa application'
+            },
+            unit_amount: 15000 // $150
           },
-          unit_amount: 15000 // $150
-        },
-        quantity: 1
-      }],
-      metadata: appNumber ? { appNumber } : {},
-      success_url: `${BASE_URL}/success.html`,
-      cancel_url: `${BASE_URL}/application.html`
-    });
+          quantity: 1
+        }],
+        metadata: appNumber ? { appNumber } : {},
+        success_url: `${BASE_URL}/success.html`,
+        cancel_url: `${BASE_URL}/application.html`
+      });
 
-    res.json({ url: sessionObj.url });
-  } catch (err) {
-    console.error('⚠️ Stripe error:', err);
-    res.status(500).json({ error: 'Failed to create payment session' });
+      res.json({ url: sessionObj.url });
+    } catch (err) {
+      console.error('⚠️ Stripe error:', err);
+      res.status(500).json({ error: 'Failed to create payment session' });
+    }
   }
-});
+);
 
 // === Stripe Webhook ===
 app.post(
@@ -187,8 +198,10 @@ app.post(
       const sessionObj = event.data.object;
       const meta = sessionObj.metadata || {};
       if (meta.appNumber) {
-        paidApps.add(meta.appNumber.toUpperCase());
+        paidApps.add(String(meta.appNumber).toUpperCase());
         console.log(`💸 Marked paid: ${meta.appNumber}`);
+      } else {
+        console.warn('checkout.session.completed without appNumber metadata');
       }
     }
 
@@ -196,7 +209,7 @@ app.post(
   }
 );
 
-// ✅ Body parsers AFTER webhook
+// ✅ Body parsers AFTER webhook (for the rest of the app)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -261,7 +274,7 @@ const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
 
 app.post('/admin/login', loginLimiter, (req, res) => {
-  const { username, password } = req.body;
+  const { username, password } = req.body || {};
   if (username === ADMIN_USER && password === ADMIN_PASS) {
     req.session.loggedIn = true;
     return res.sendStatus(200);
@@ -296,7 +309,7 @@ app.get('/admin/applications', isAuthenticated, (_req, res) => {
 });
 
 app.post('/admin/update-status', isAuthenticated, (req, res) => {
-  const { appNumber, status } = req.body;
+  const { appNumber, status } = req.body || {};
   const found = applications.find(a => a.appNumber === appNumber);
   if (!found) return res.status(404).json({ message: 'Application not found' });
   found.status = status;
@@ -305,7 +318,7 @@ app.post('/admin/update-status', isAuthenticated, (req, res) => {
 
 // === Tracking ===
 app.post('/track', (req, res) => {
-  const { appNumber, lastName } = req.body;
+  const { appNumber, lastName } = req.body || {};
   if (!appNumber || !lastName) {
     return res.status(400).json({ message: 'Missing tracking fields' });
   }
