@@ -26,13 +26,15 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 // Trust Render’s proxy (for secure cookies, HTTPS)
 app.set('trust proxy', 1);
 
-// Security headers
+// Security headers (allow Stripe, inline CSS/JS used on success.html, and Google Fonts)
 app.use(
   helmet({
     contentSecurityPolicy: {
       useDefaults: true,
       directives: {
-        "script-src": ["'self'", "https://js.stripe.com"],
+        "script-src": ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
         "frame-src": ["'self'", "https://js.stripe.com"],
         "connect-src": ["'self'", "https://api.stripe.com"],
         "img-src": ["'self'", "data:"]
@@ -80,7 +82,6 @@ const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (_req, file, cb) => {
     if (allowedMime.has(file.mimetype)) return cb(null, true);
-    // Use a MulterError so our Multer error handler catches it cleanly
     return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Only PDF, JPG, and PNG files are allowed.'));
   }
 });
@@ -108,6 +109,15 @@ const checkoutLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many payment requests. Please slow down.' }
+});
+
+// (New) Rate limit the tracking endpoint lightly
+const trackLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many track requests. Please try again later.' }
 });
 
 // ✅ Health check for Render
@@ -240,7 +250,8 @@ app.post('/submit', uploadLimiter, upload.single('passportFile'), async (req, re
       passport,
       appNumber,
       passportFileName,
-      status: 'Pending Review'
+      status: 'Pending Review',
+      submittedAt: new Date().toISOString() // <-- helpful for admin view
     });
 
     const transporter = nodemailer.createTransport({
@@ -303,7 +314,8 @@ app.get('/admin/applications', isAuthenticated, (_req, res) => {
     nationality: app.nationality,
     passport: app.passport,
     status: app.status,
-    passportFileName: app.passportFileName || ''
+    passportFileName: app.passportFileName || '',
+    submittedAt: app.submittedAt
   }));
   res.json(sanitized);
 });
@@ -317,7 +329,7 @@ app.post('/admin/update-status', isAuthenticated, (req, res) => {
 });
 
 // === Tracking ===
-app.post('/track', (req, res) => {
+app.post('/track', trackLimiter, (req, res) => {
   const { appNumber, lastName } = req.body || {};
   if (!appNumber || !lastName) {
     return res.status(400).json({ message: 'Missing tracking fields' });
