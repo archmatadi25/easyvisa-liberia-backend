@@ -293,3 +293,4 @@ form input:focus {
 .app-table tbody tr:hover {
   background-color: #e6f2ff;
 }
+html { scroll-behavior: smooth; }
