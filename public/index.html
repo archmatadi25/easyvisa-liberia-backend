@@ -8,26 +8,57 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- Header -->
   <header>
-    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
-    <nav>
-      <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="#requirements">Requirements</a></li>
-        <li><a href="track.html">Track Application</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
+    <div class="container">
+      <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#requirements">Requirements</a></li>
+          <li><a href="track.html">Track Application</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="hero">
     <h1>Your Smooth Path to Liberia Starts Here</h1>
-    <a href="application.html" class="btn">Start Your Application</a>
+    <p style="max-width: 720px; margin: 8px 16px 22px; font-size: 1.05rem;">
+      Fast, secure, and guided visa application—built to save you time and keep you updated at every step.
+    </p>
+    <div>
+      <a href="application.html" class="btn" style="margin-right: 10px;">Start Your Application</a>
+      <a href="#requirements" class="btn btn-link">View Requirements</a>
+    </div>
+  </section>
+
+  <!-- Value props -->
+  <section class="container" style="margin: 36px auto;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
+      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
+        <h3 style="margin:0 0 8px; color:var(--primary);">Simple</h3>
+        <p style="margin:0; color:var(--muted);">Clean, guided form and one secure payment.</p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
+        <h3 style="margin:0 0 8px; color:var(--primary);">Secure</h3>
+        <p style="margin:0; color:var(--muted);">HTTPS, file type limits, and Stripe payments.</p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
+        <h3 style="margin:0 0 8px; color:var(--primary);">Trackable</h3>
+        <p style="margin:0; color:var(--muted);">Check your status anytime on the tracking page.</p>
+      </div>
+      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
+        <h3 style="margin:0 0 8px; color:var(--primary);">Support</h3>
+        <p style="margin:0; color:var(--muted);">Questions? Reach us via email or phone.</p>
+      </div>
+    </div>
   </section>
 
   <!-- ECOWAS Visa-Free Notice -->
-  <main class="form-container">
+  <main class="form-container" style="max-width: 900px;">
     <div class="ecowas-notice">
       <p><strong>Citizens of these 14 ECOWAS (West African) nations can enter Liberia visa-free:</strong></p>
       <div class="ecowas-table">
@@ -49,7 +80,7 @@
     </div>
   </main>
 
-  <!-- Visa Requirements Section -->
+  <!-- Visa Requirements -->
   <section id="requirements" class="info-section">
     <h2>Visa Requirements</h2>
     <ul>
@@ -60,7 +91,7 @@
     </ul>
   </section>
 
-  <!-- Contact Section -->
+  <!-- Contact -->
   <section id="contact" class="info-section">
     <h2>Contact Us</h2>
     <p>Have questions or need assistance?</p>
