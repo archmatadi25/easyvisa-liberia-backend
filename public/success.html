@@ -11,8 +11,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 80vh;
+      height: 70vh;
       text-align: center;
+      padding: 24px;
     }
     .spinner {
       border: 6px solid #f3f3f3;
@@ -23,18 +24,29 @@
       animation: spin 1s linear infinite;
       margin: 20px 0;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="loading-container">
+  <!-- Header + Nav (links jump to sections on application.html) -->
+  <header>
+    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="application.html#requirements">Requirements</a></li>
+        <li><a href="track.html">Track Application</a></li>
+        <li><a href="application.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Loading / auto-submit -->
+  <main class="loading-container">
     <h2>Processing your application...</h2>
     <div class="spinner"></div>
     <p>Please wait, this may take a few seconds.</p>
-  </div>
+  </main>
 
   <script>
     // Helper: convert base64 to Blob
@@ -42,9 +54,8 @@
       const parts = dataURL.split(',');
       const mime = parts[0].match(/:(.*?);/)[1];
       const binary = atob(parts[1]);
-      let len = binary.length;
-      const u8arr = new Uint8Array(len);
-      while (len--) u8arr[len] = binary.charCodeAt(len);
+      const u8arr = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) u8arr[i] = binary.charCodeAt(i);
       return new Blob([u8arr], { type: mime });
     }
 
@@ -60,9 +71,7 @@
       }
 
       const formData = new FormData();
-      for (const key in data) {
-        formData.append(key, data[key]);
-      }
+      Object.keys(data).forEach(k => formData.append(k, data[k]));
 
       if (base64 && filename) {
         const fileBlob = dataURLToBlob(base64);
@@ -70,10 +79,7 @@
       }
 
       try {
-        const res = await fetch("/submit", {
-          method: "POST",
-          body: formData
-        });
+        const res = await fetch("/submit", { method: "POST", body: formData });
 
         if (res.ok) {
           localStorage.setItem("latestApplication", JSON.stringify(data));
@@ -82,7 +88,8 @@
           localStorage.removeItem("passportFileName");
           window.location.href = "confirmation.html";
         } else {
-          alert("There was a problem submitting your application. Please try again.");
+          const r = await res.json().catch(() => ({}));
+          alert(r.message || "There was a problem submitting your application. Please try again.");
           window.location.href = "application.html";
         }
       } catch (err) {
