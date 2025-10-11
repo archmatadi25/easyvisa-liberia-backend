@@ -16,7 +16,7 @@
         <ul>
           <li><a href="index.html">Home</a></li>
           <li><a href="application.html#requirements">Requirements</a></li>
-          <li><a href="track.html">Track Application</a></li>
+          <li><a href="track.html" aria-current="page">Track Application</a></li>
           <li><a href="application.html#contact">Contact</a></li>
         </ul>
       </nav>
@@ -27,22 +27,28 @@
   <section class="container" style="max-width:900px; text-align:center; margin-top:40px;">
     <h1 style="font-size:2rem; color:#004080; margin-bottom:8px;">Track Your Visa Application</h1>
     <p style="color:#555; max-width:640px; margin:0 auto;">
-      Enter your <strong>Application Number</strong> and <strong>Last Name</strong> below to check your current visa application status in real-time.
+      Enter your <strong>Application Number</strong> and <strong>Last Name</strong> below to check your current status.
     </p>
   </section>
 
   <!-- Form -->
   <main class="form-container" style="max-width:700px;">
-    <form id="trackForm">
+    <form id="trackForm" novalidate>
       <label for="trackNumber">Application Number:</label>
       <input
         type="text"
         id="trackNumber"
         name="trackNumber"
         required
+        minlength="12"
+        maxlength="16"
         pattern="[A-Z0-9]{12,16}"
         title="12 to 16 uppercase alphanumeric characters"
         class="uppercase-input"
+        inputmode="latin"
+        autocapitalize="characters"
+        autocomplete="off"
+        spellcheck="false"
       />
 
       <label for="trackLastName">Last Name:</label>
@@ -51,16 +57,21 @@
         id="trackLastName"
         name="trackLastName"
         required
+        minlength="2"
         pattern="[A-Za-z]{2,}"
         title="Last name must be at least 2 letters"
         class="uppercase-input"
+        autocapitalize="characters"
+        autocomplete="family-name"
+        spellcheck="false"
       />
 
       <button type="submit" class="btn" style="width:100%; margin-top:20px;">Track Application</button>
     </form>
 
-    <div id="result"></div>
-    <div id="error"></div>
+    <!-- aria-live so screen readers announce updates -->
+    <div id="result" aria-live="polite"></div>
+    <div id="error" aria-live="assertive"></div>
   </main>
 
   <!-- Help / Tips -->
