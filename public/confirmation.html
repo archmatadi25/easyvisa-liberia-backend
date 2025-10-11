@@ -38,8 +38,14 @@
       <p style="color:#555; margin:0 0 6px 0;">Thank you for applying for a Liberian visa.</p>
       <p style="color:#555; margin:0;">Your unique application number is:</p>
 
-      <!-- App Number (kept same ID for JS) -->
-      <h1 id="appNumber" style="font-size:2rem; letter-spacing:2px; margin:6px 0 4px 0;"></h1>
+      <!-- App Number + Copy -->
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;">
+        <h1 id="appNumber" style="font-size:2rem; letter-spacing:2px; margin:6px 0 4px 0;"></h1>
+        <button id="copyBtn" class="btn" type="button" style="padding:10px 14px;">Copy</button>
+      </div>
+      <div id="copyToast" role="status" aria-live="polite" style="display:none; color:#155724; background:#e6ffed; border:1px solid #b2e2c6; padding:8px 12px; border-radius:8px;">
+        Copied to clipboard
+      </div>
 
       <p style="color:#555; max-width:560px;">
         Please save this number along with your <strong>last name</strong>. You’ll need both to
@@ -65,5 +71,33 @@
   </section>
 
   <script src="js/script.js"></script>
+  <script>
+    // Copy-to-clipboard for the application number
+    document.addEventListener('DOMContentLoaded', () => {
+      const copyBtn = document.getElementById('copyBtn');
+      const appNumberEl = document.getElementById('appNumber');
+      const toast = document.getElementById('copyToast');
+
+      copyBtn?.addEventListener('click', async () => {
+        const val = (appNumberEl?.textContent || '').trim();
+        if (!val) return;
+        try {
+          await navigator.clipboard.writeText(val);
+          toast.style.display = 'inline-block';
+          setTimeout(() => (toast.style.display = 'none'), 1600);
+        } catch {
+          // Fallback for older browsers
+          const tmp = document.createElement('input');
+          tmp.value = val;
+          document.body.appendChild(tmp);
+          tmp.select();
+          document.execCommand('copy');
+          document.body.removeChild(tmp);
+          toast.style.display = 'inline-block';
+          setTimeout(() => (toast.style.display = 'none'), 1600);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
