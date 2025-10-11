@@ -6,6 +6,67 @@
   <title>Visa Application – EasyVisa Liberia</title>
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Page-local polish to complement style.css */
+    .subhero {
+      background: linear-gradient(180deg, rgba(0,64,128,0.08), rgba(0,64,128,0.03));
+      border-bottom: 1px solid #e6edf5;
+      padding: 36px 20px 28px;
+      text-align: center;
+    }
+    .subhero h1 {
+      margin: 0 0 8px;
+      font-weight: 600;
+      color: #0d2b59;
+      letter-spacing: .3px;
+    }
+    .subhero p {
+      margin: 0 auto;
+      max-width: 760px;
+      color: #4a5568;
+      font-size: 1rem;
+    }
+    .steps {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      margin: 14px auto 0;
+    }
+    .chip {
+      background:#e8f0fe;
+      color:#003366;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:.9rem;
+      border: 1px solid #d6e3ff;
+    }
+    .chip--active {
+      background:#004080;
+      color:#fff;
+      border-color:#004080;
+    }
+    .card {
+      background:#fff;
+      border:1px solid #e6eaf0;
+      border-radius:12px;
+      padding:20px;
+      box-shadow: 0 6px 24px rgba(16, 24, 40, 0.04);
+    }
+    .two-col {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:18px;
+    }
+    @media (min-width: 900px) {
+      .two-col { grid-template-columns: 2fr 1fr; }
+    }
+    .muted {
+      color:#556070;
+      font-size:.95rem;
+    }
+  </style>
 </head>
 <body>
   <!-- Header -->
@@ -15,6 +76,7 @@
       <nav>
         <ul>
           <li><a href="index.html">Home</a></li>
+          <!-- these target anchors on THIS page -->
           <li><a href="#requirements">Requirements</a></li>
           <li><a href="track.html">Track Application</a></li>
           <li><a href="#contact">Contact</a></li>
@@ -23,90 +85,95 @@
     </div>
   </header>
 
-  <!-- Slim progress / context -->
-  <section class="container" style="max-width:900px; margin:24px auto 0;">
-    <div style="display:grid; grid-template-columns:1fr; gap:8px;">
-      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <span style="background:#004080; color:#fff; padding:6px 10px; border-radius:999px; font-size:.9rem;">Step 1: Application</span>
-        <span style="background:#e8f0fe; color:#003366; padding:6px 10px; border-radius:999px; font-size:.9rem;">Step 2: Payment</span>
-        <span style="background:#e8f0fe; color:#003366; padding:6px 10px; border-radius:999px; font-size:.9rem;">Step 3: Confirmation</span>
-      </div>
-      <p style="margin:0; color:#555; font-size:.95rem;">
-        Fill the form below. You’ll pay the fee securely with Stripe, then we’ll submit your application automatically.
-      </p>
+  <!-- Mini hero / context -->
+  <section class="subhero">
+    <h1>Apply for Your Liberia Visa</h1>
+    <p>Complete the form, pay securely with Stripe, and we’ll submit your application automatically. You can track your status anytime.</p>
+    <div class="steps">
+      <span class="chip chip--active">Step 1: Application</span>
+      <span class="chip">Step 2: Payment</span>
+      <span class="chip">Step 3: Confirmation</span>
     </div>
   </section>
 
-  <!-- Main form card -->
-  <main class="form-container" style="max-width:900px;">
-    <h2 style="text-align:left;">Visa Application Form</h2>
+  <!-- Main content -->
+  <main class="container" style="max-width: 1000px; margin: 28px auto;">
+    <div class="two-col">
+      <!-- Form card -->
+      <section class="card">
+        <h2 style="margin-top:0;">Visa Application Form</h2>
 
-    <!-- Two-column responsive layout -->
-    <div style="display:grid; grid-template-columns:1fr; gap:18px;">
-      <form id="applicationForm" enctype="multipart/form-data" style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow: var(--shadow);">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:14px;">
-          <div>
-            <label for="firstname">First Name:</label>
-            <input type="text" id="firstname" name="firstname" required />
+        <form id="applicationForm" enctype="multipart/form-data">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:14px;">
+            <div>
+              <label for="firstname">First Name:</label>
+              <input type="text" id="firstname" name="firstname" required />
+            </div>
+
+            <div>
+              <label for="middlename">Middle Name:</label>
+              <input type="text" id="middlename" name="middlename" />
+            </div>
+
+            <div>
+              <label for="lastname">Last Name:</label>
+              <input type="text" id="lastname" name="lastname" required />
+            </div>
+
+            <div>
+              <label for="dob">Date of Birth:</label>
+              <input type="date" id="dob" name="dob" required />
+            </div>
+
+            <div>
+              <label for="email">Email Address:</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+
+            <div>
+              <label for="nationality">Nationality:</label>
+              <select id="nationality" name="nationality" required>
+                <option value="">-- Select --</option>
+                <option value="American">American</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="passport">Passport Number:</label>
+              <input type="text" id="passport" name="passport" required />
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+              <!-- Match server 5MB limit -->
+              <label for="passportFile">Upload Passport Bio Page (PDF or Image, max 5MB):</label>
+              <input type="file" id="passportFile" name="passportFile" accept=".pdf, image/*" required />
+            </div>
           </div>
 
-          <div>
-            <label for="middlename">Middle Name:</label>
-            <input type="text" id="middlename" name="middlename" />
-          </div>
+          <p class="muted" style="margin-top:16px;">
+            <strong>Note:</strong> You will proceed to pay the <strong>$150 visa fee</strong> before final submission.
+          </p>
 
-          <div>
-            <label for="lastname">Last Name:</label>
-            <input type="text" id="lastname" name="lastname" required />
-          </div>
+          <button type="button" id="proceedToPayment" class="btn" style="width:100%; margin-top:16px;">
+            Proceed to Payment
+          </button>
+        </form>
+      </section>
 
-          <div>
-            <label for="dob">Date of Birth:</label>
-            <input type="date" id="dob" name="dob" required />
-          </div>
-
-          <div>
-            <label for="email">Email Address:</label>
-            <input type="email" id="email" name="email" required />
-          </div>
-
-          <div>
-            <label for="nationality">Nationality:</label>
-            <select id="nationality" name="nationality" required>
-              <option value="">-- Select --</option>
-              <option value="American">American</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="passport">Passport Number:</label>
-            <input type="text" id="passport" name="passport" required />
-          </div>
-
-          <div style="grid-column:1/-1;">
-            <!-- Match server 5MB limit -->
-            <label for="passportFile">Upload Passport Bio Page (PDF or Image, max 5MB):</label>
-            <input type="file" id="passportFile" name="passportFile" accept=".pdf, image/*" required />
-          </div>
-        </div>
-
-        <p style="margin-top:18px; font-size:.95rem; color:#555;">
-          <strong>Note:</strong> You will proceed to pay the <strong>$150 visa fee</strong> before final submission.
-        </p>
-
-        <button type="button" id="proceedToPayment" class="btn" style="width:100%; margin-top:18px;">
-          Proceed to Payment
-        </button>
-      </form>
-
-      <!-- Helpful info card -->
-      <aside style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
+      <!-- Tips / help card -->
+      <aside class="card">
         <h3 style="margin-top:0; color:#004080;">Tips for a Smooth Application</h3>
         <ul style="margin:10px 0 0 18px; color:#555;">
-          <li>Make sure your passport has at least 6 months validity.</li>
-          <li>Upload a clear, readable scan/photo of your bio page.</li>
+          <li>Ensure your passport has at least 6 months remaining validity.</li>
+          <li>Upload a clear, readable scan/photo of the bio page.</li>
           <li>Use an email you check frequently for updates.</li>
         </ul>
+
+        <div style="margin-top:18px; padding:12px; border:1px dashed #c9d6ea; border-radius:10px; background:#f7fbff;">
+          <p style="margin:0; color:#334155; font-size:.95rem;">
+            After payment, you’ll be redirected and your application will auto-submit. Keep your browser open until you see the confirmation screen.
+          </p>
+        </div>
       </aside>
     </div>
   </main>
@@ -153,7 +220,7 @@
     <p><strong>Hours:</strong> Monday – Friday, 9am – 5pm EST</p>
   </section>
 
-  <!-- Keep the cache-busting flag you already use -->
+  <!-- Keep cache-busting so clients pull the latest JS -->
   <script src="js/script.js?v=2"></script>
 </body>
 </html>

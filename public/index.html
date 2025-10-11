@@ -10,57 +10,55 @@
 <body>
   <!-- Header -->
   <header>
-    <div class="container">
-      <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
-      <nav>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="#requirements">Requirements</a></li>
-          <li><a href="track.html">Track Application</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-      </nav>
-    </div>
+    <img src="images/logo.png" alt="EasyVisa Liberia Logo" class="logo" />
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="index.html" aria-current="page">Home</a></li>
+        <li><a href="#requirements">Requirements</a></li>
+        <li><a href="track.html">Track Application</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
   </header>
 
   <!-- Hero -->
-  <section class="hero">
+  <section class="hero" role="banner">
     <h1>Your Smooth Path to Liberia Starts Here</h1>
     <p style="max-width: 720px; margin: 8px 16px 22px; font-size: 1.05rem;">
       Fast, secure, and guided visa application—built to save you time and keep you updated at every step.
     </p>
     <div>
       <a href="application.html" class="btn" style="margin-right: 10px;">Start Your Application</a>
-      <a href="#requirements" class="btn btn-link">View Requirements</a>
+      <a href="#requirements" class="btn">View Requirements</a>
     </div>
   </section>
 
-  <!-- Value props -->
-  <section class="container" style="margin: 36px auto;">
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
-      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
-        <h3 style="margin:0 0 8px; color:var(--primary);">Simple</h3>
-        <p style="margin:0; color:var(--muted);">Clean, guided form and one secure payment.</p>
-      </div>
-      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
-        <h3 style="margin:0 0 8px; color:var(--primary);">Secure</h3>
-        <p style="margin:0; color:var(--muted);">HTTPS, file type limits, and Stripe payments.</p>
-      </div>
-      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
-        <h3 style="margin:0 0 8px; color:var(--primary);">Trackable</h3>
-        <p style="margin:0; color:var(--muted);">Check your status anytime on the tracking page.</p>
-      </div>
-      <div style="background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: var(--shadow);">
-        <h3 style="margin:0 0 8px; color:var(--primary);">Support</h3>
-        <p style="margin:0; color:var(--muted);">Questions? Reach us via email or phone.</p>
-      </div>
+  <!-- Value Props -->
+  <section class="container" style="margin: 40px auto;">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px;">
+      <article style="background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <h3 style="margin:0 0 8px; color:#004080;">Simple</h3>
+        <p style="margin:0; color:#555;">Clean, guided form and one secure payment.</p>
+      </article>
+      <article style="background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <h3 style="margin:0 0 8px; color:#004080;">Secure</h3>
+        <p style="margin:0; color:#555;">HTTPS, file type limits, and Stripe payments.</p>
+      </article>
+      <article style="background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <h3 style="margin:0 0 8px; color:#004080;">Trackable</h3>
+        <p style="margin:0; color:#555;">Check your status anytime on the tracking page.</p>
+      </article>
+      <article style="background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <h3 style="margin:0 0 8px; color:#004080;">Support</h3>
+        <p style="margin:0; color:#555;">Questions? Reach us via email or phone.</p>
+      </article>
     </div>
   </section>
 
   <!-- ECOWAS Visa-Free Notice -->
   <main class="form-container" style="max-width: 900px;">
-    <div class="ecowas-notice">
-      <p><strong>Citizens of these 14 ECOWAS (West African) nations can enter Liberia visa-free:</strong></p>
+    <div class="ecowas-notice" aria-labelledby="ecowas-title">
+      <p id="ecowas-title"><strong>Citizens of these 14 ECOWAS (West African) nations can enter Liberia visa-free:</strong></p>
       <div class="ecowas-table">
         <div><img src="images/flags/benin.png" alt="Benin Flag"> Benin</div>
         <div><img src="images/flags/burkina-faso.png" alt="Burkina Faso Flag"> Burkina Faso</div>
@@ -81,25 +79,40 @@
   </main>
 
   <!-- Visa Requirements -->
-  <section id="requirements" class="info-section">
-    <h2>Visa Requirements</h2>
+  <section id="requirements" class="info-section" aria-labelledby="req-title">
+    <h2 id="req-title">Visa Requirements</h2>
     <ul>
       <li>Completed Visa Application Form</li>
       <li>Valid Passport (minimum 6 months validity)</li>
       <li>Payment of visa fees (non-refundable)</li>
-      <li>Upload of passport bio page (PDF or image under 10MB)</li>
+      <li>Upload of passport bio page (PDF or image under 5MB)</li>
     </ul>
+    <div style="text-align:center; margin-top:14px;">
+      <a class="btn" href="application.html">Start Your Application</a>
+    </div>
   </section>
 
   <!-- Contact -->
-  <section id="contact" class="info-section">
-    <h2>Contact Us</h2>
+  <section id="contact" class="info-section" aria-labelledby="contact-title">
+    <h2 id="contact-title">Contact Us</h2>
     <p>Have questions or need assistance?</p>
     <p><strong>Email:</strong> easyvisa2liberia@gmail.com</p>
     <p><strong>Phone:</strong> +1 (612) 470-6846</p>
     <p><strong>Hours:</strong> Monday – Friday, 9am – 5pm EST</p>
+    <div style="text-align:center; margin-top:14px;">
+      <a class="btn" href="track.html">Track Your Application</a>
+    </div>
   </section>
 
+  <!-- (Optional) simple footer -->
+  <footer style="text-align:center; padding:24px; color:#666;">
+    © <span id="year"></span> EasyVisa Liberia. All rights reserved.
+  </footer>
+
+  <script>
+    // tiny helper to keep footer year current
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
   <script src="js/script.js"></script>
 </body>
 </html>
