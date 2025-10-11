@@ -168,7 +168,7 @@ app.post(
               name: 'Liberia Visa Application Fee',
               description: 'Required for processing your visa application'
             },
-            unit_amount: 1500 // $150
+            unit_amount: 15000 // $150
           },
           quantity: 1
         }],
