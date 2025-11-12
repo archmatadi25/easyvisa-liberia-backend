@@ -8,6 +8,8 @@ const session = require('express-session');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// NEW: HEIC converter
+const heicConvert = require('heic-convert');
 
 // --- DB (optional but recommended) ---
 const { Pool } = require('pg');
@@ -193,13 +195,20 @@ const storage = multer.diskStorage({
   }
 });
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const allowedMime = new Set(['application/pdf', 'image/jpeg', 'image/png']);
+// NEW: allow HEIC/HEIF in addition to pdf/jpeg/png
+const allowedMime = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/heic',
+  'image/heif'
+]);
 const upload = multer({
   storage,
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (_req, file, cb) => {
     if (allowedMime.has(file.mimetype)) return cb(null, true);
-    return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Only PDF, JPG, and PNG files are allowed.'));
+    return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Only PDF, JPG, PNG, and HEIC/HEIF images are allowed.'));
   }
 });
 
@@ -286,7 +295,7 @@ app.post(
           quantity: 1
         }],
         metadata: appNumber ? { appNumber } : {},
-        success_url: `${BASE_URL}/success.html`,
+        success_url: `${BASE_URL}/success.html`, // (Optionally add ?session_id={CHECKOUT_SESSION_ID})
         cancel_url: `${BASE_URL}/application.html`
       });
 
@@ -348,7 +357,29 @@ app.post('/submit', uploadLimiter, upload.single('passportFile'), async (req, re
       return res.status(402).json({ message: 'Payment required before submission' });
     }
 
-    const passportFileName = req.file ? req.file.filename : '';
+    // filename from upload (may be .pdf/.jpg/.png/.heic/.heif)
+    let passportFileName = req.file ? req.file.filename : '';
+
+    // NEW: if HEIC/HEIF uploaded, convert to JPG and replace the file
+    if (req.file && (req.file.mimetype === 'image/heic' || req.file.mimetype === 'image/heif')) {
+      try {
+        const inputBuf = fs.readFileSync(req.file.path);
+        const outputBuf = await heicConvert({
+          buffer: inputBuf,
+          format: 'JPEG',
+          quality: 0.9
+        });
+        const newName = req.file.filename.replace(/\.\w+$/, '') + '.jpg';
+        fs.writeFileSync(path.join(UPLOAD_DIR, newName), outputBuf);
+        fs.unlinkSync(req.file.path); // remove original HEIC/HEIF
+        passportFileName = newName;
+      } catch (e) {
+        console.error('HEIC convert failed:', e);
+        return res.status(400).json({
+          message: 'We could not process your HEIC image. Please upload PDF, JPG, or PNG.'
+        });
+      }
+    }
 
     // Persist
     await dbInsertApplication({
